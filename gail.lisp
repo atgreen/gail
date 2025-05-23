@@ -97,6 +97,7 @@ Don't say anything else.\n\n~A\n\nAnswer:"
                             (format t "  Error on issue ~a: ~a~%" issue-num e)))))))))))))))
 
 (defun print-usage ()
+  (format t "gail 1.0 - copyright (C) 2025 Anthony Green <green@moxielogic.com>~%~%")
   (format t "Usage: ~a [OPTIONS] OWNER REPO~%~%" (first sb-ext:*posix-argv*))
   (format t "Options:~%")
   (format t "  -l, --labels FILE     Labels file (default: labels.txt)~%")
@@ -114,7 +115,9 @@ Don't say anything else.\n\n~A\n\nAnswer:"
   (format t "~%")
   (format t "Examples:~%")
   (format t "  ~a libffi libffi~%" (first sb-ext:*posix-argv*))
-  (format t "  ~a --labels my-labels.txt --dry-run microsoft vscode~%" (first sb-ext:*posix-argv*)))
+  (format t "  ~a --labels my-labels.txt --dry-run microsoft vscode~%~%" (first sb-ext:*posix-argv*))
+  (format t "Distributed under the terms of the MIT License~%"))
+
 
 (defun parse-command-line (args)
   "Parse command line arguments and return options and positional arguments."

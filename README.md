@@ -15,6 +15,38 @@ $ ocicl install
 ```
 Now run `make`.  You are done.
 
+Using `gail`
+-------------
+
+Labeling Issues has never been easier.  Here's the `gail` help message
+with all of the instructions that you'll need:
+
+```
+gail 1.0 - copyright (C) 2025 Anthony Green <green@moxielogic.com>
+
+Usage: ./gail [OPTIONS] OWNER REPO
+
+Options:
+  -l, --labels FILE     Labels file (default: labels.txt)
+  -n, --dry-run         Show what would be labeled without actually labeling
+  -m, --model MODEL     OpenAI model to use (default: gpt-4o-mini)
+  -h, --help            Show this help message
+
+Arguments:
+  OWNER                 GitHub repository owner
+  REPO                  GitHub repository name
+
+Environment variables:
+  GITHUB_TOKEN          GitHub API token (required)
+  OPENAI_KEY            OpenAI API key (required)
+
+Examples:
+  ./gail libffi libffi
+  ./gail --labels my-labels.txt --dry-run microsoft vscode
+
+Distributed under the terms of the MIT License
+```
+
 
 Author and License
 -------------------
