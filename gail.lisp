@@ -2,9 +2,11 @@
 (asdf:load-system :dexador)
 (asdf:load-system :jonathan)
 (asdf:load-system :split-sequence)
+(asdf:load-system :clingon)
 
 (defpackage :gail
-  (:use :cl :split-sequence))
+  (:use :cl :split-sequence)
+  (:export #:main))
 (in-package :gail)
 
 (defun get-github-token ()
@@ -96,102 +98,94 @@ Don't say anything else.\n\n~A\n\nAnswer:"
                           (error (e)
                             (format t "  Error on issue ~a: ~a~%" issue-num e)))))))))))))))
 
-(defun print-usage ()
-  (format t "gail 1.0 - copyright (C) 2025 Anthony Green <green@moxielogic.com>~%~%")
-  (format t "Usage: ~a [OPTIONS] OWNER REPO~%~%" (first sb-ext:*posix-argv*))
-  (format t "Options:~%")
-  (format t "  -l, --labels FILE     Labels file (default: labels.txt)~%")
-  (format t "  -n, --dry-run         Show what would be labeled without actually labeling~%")
-  (format t "  -m, --model MODEL     OpenAI model to use (default: gpt-4o-mini)~%")
-  (format t "  -h, --help            Show this help message~%")
-  (format t "~%")
-  (format t "Arguments:~%")
-  (format t "  OWNER                 GitHub repository owner~%")
-  (format t "  REPO                  GitHub repository name~%")
-  (format t "~%")
-  (format t "Environment variables:~%")
-  (format t "  GITHUB_TOKEN          GitHub API token (required)~%")
-  (format t "  OPENAI_KEY            OpenAI API key (required)~%")
-  (format t "~%")
-  (format t "Examples:~%")
-  (format t "  ~a libffi libffi~%" (first sb-ext:*posix-argv*))
-  (format t "  ~a --labels my-labels.txt --dry-run microsoft vscode~%~%" (first sb-ext:*posix-argv*))
-  (format t "Distributed under the terms of the MIT License~%"))
+(defun gail/options ()
+  "Define command-line options for gail"
+  (list
+   (clingon:make-option
+    :filepath
+    :description "Labels file"
+    :short-name #\l
+    :long-name "labels"
+    :initial-value ".gail-labels"
+    :key :labels-file)
 
+   (clingon:make-option
+    :flag
+    :description "Show what would be labeled without actually labeling"
+    :short-name #\n
+    :long-name "dry-run"
+    :key :dry-run)
 
-(defun parse-command-line (args)
-  "Parse command line arguments and return options and positional arguments."
-  (let ((labels-file "labels.txt")
-        (dry-run nil)
-        (model "gpt-4o-mini")
-        (positional '())
-        (i 0))
-    (loop while (< i (length args))
-          for arg = (nth i args)
-          do (cond
-               ((or (string= arg "-h") (string= arg "--help"))
-                (print-usage)
-                (uiop:quit 0))
-               ((or (string= arg "-l") (string= arg "--labels"))
-                (incf i)
-                (when (>= i (length args))
-                  (error "Option ~a requires an argument" arg))
-                (setf labels-file (nth i args)))
-               ((or (string= arg "-n") (string= arg "--dry-run"))
-                (setf dry-run t))
-               ((or (string= arg "-m") (string= arg "--model"))
-                (incf i)
-                (when (>= i (length args))
-                  (error "Option ~a requires an argument" arg))
-                (setf model (nth i args)))
-               ((char= (char arg 0) #\-)
-                (error "Unknown option: ~a" arg))
-               (t
-                (push arg positional)))
-          do (incf i))
-    (values labels-file dry-run model (nreverse positional))))
+   (clingon:make-option
+    :string
+    :description "OpenAI model to use"
+    :short-name #\m
+    :long-name "model"
+    :initial-value "gpt-4o-mini"
+    :key :model)))
 
-(defun main ()
-  (handler-case
-      (multiple-value-bind (labels-file dry-run model positional-args)
-          (parse-command-line (rest sb-ext:*posix-argv*))
+(defun gail/handler (cmd)
+  "Main command handler for gail"
+  (let ((labels-file (clingon:getopt cmd :labels-file))
+        (dry-run (clingon:getopt cmd :dry-run))
+        (model (clingon:getopt cmd :model))
+        (args (clingon:command-arguments cmd)))
 
-        ;; Validate positional arguments
-        (when (< (length positional-args) 2)
-          (format *error-output* "Error: OWNER and REPO arguments are required~%~%")
-          (print-usage)
+    ;; Validate positional arguments
+    (when (< (length args) 2)
+      (format *error-output* "Error: OWNER and REPO arguments are required~%~%")
+      (clingon:print-usage-and-exit cmd t))
+
+    (let ((owner (first args))
+          (repo (second args)))
+
+      ;; Read labels from file
+      (let ((available-labels (read-labels-from-file labels-file)))
+        (unless available-labels
+          (format *error-output* "Error: Could not read labels from ~a or file is empty~%" labels-file)
           (uiop:quit 1))
 
-        (let ((owner (first positional-args))
-              (repo (second positional-args)))
+        (format t "Using labels from ~a: ~{~A~^, ~}~%" labels-file available-labels)
+        (format t "Repository: ~a/~a~%" owner repo)
+        (format t "Model: ~a~%" model)
+        (when dry-run
+          (format t "DRY RUN MODE - No labels will actually be applied~%"))
+        (format t "~%")
 
-          ;; Read labels from file
-          (let ((available-labels (read-labels-from-file labels-file)))
-            (unless available-labels
-              (format *error-output* "Error: Could not read labels from ~a or file is empty~%" labels-file)
-              (uiop:quit 1))
+        ;; Fetch issues and process them
+        (format t "Fetching issues from ~a/~a...~%" owner repo)
+        (let ((json-pages (fetch-all-issues-raw owner repo))
+              (completer (make-instance 'completions:openai-completer
+                                        :api-key (get-openai-key)
+                                        :model model)))
+          (format t "Processing ~d page(s) of issues...~%" (length json-pages))
+          (label-issues json-pages completer owner repo available-labels :dry-run dry-run))
 
-            (format t "Using labels from ~a: ~{~A~^, ~}~%" labels-file available-labels)
-            (format t "Repository: ~a/~a~%" owner repo)
-            (format t "Model: ~a~%" model)
-            (when dry-run
-              (format t "DRY RUN MODE - No labels will actually be applied~%"))
-            (format t "~%")
+        (format t "~&Done.~%")))))
 
-            ;; Fetch issues and process them
-            (format t "Fetching issues from ~a/~a...~%" owner repo)
-            (let ((json-pages (fetch-all-issues-raw owner repo))
-                  (completer (make-instance 'completions:openai-completer
-                                            :api-key (get-openai-key)
-                                            :model model)))
-              (format t "Processing ~d page(s) of issues...~%" (length json-pages))
-              (label-issues json-pages completer owner repo available-labels :dry-run dry-run))
+(defun gail/command ()
+  "Create the main gail command"
+  (clingon:make-command
+   :name "gail"
+   :version "1.0"
+   :description "GitHub Issue Auto-Labeler using AI"
+   :authors '("Anthony Green <green@moxielogic.com>")
+   :license "MIT License"
+   :usage "OWNER REPO"
+   :options (gail/options)
+   :handler #'gail/handler
+   :examples '(("Label issues in the libffi/libffi repository:"
+                . "gail libffi libffi")
+               ("Dry run with custom labels file:"
+                . "gail --labels my-labels.txt --dry-run microsoft vscode")
+               ("Use a different OpenAI model:"
+                . "gail --model gpt-4 owner repo"))))
 
-            (format t "~&Done.~%"))))
-
+(defun main ()
+  "Main entry point"
+  (handler-case
+      (let ((app (gail/command)))
+        (clingon:run app))
     (error (e)
       (format *error-output* "Error: ~a~%" e)
       (uiop:quit 1))))
-
-;; Uncomment the line below to call main when loading this file
-  ;; (main)

@@ -1,5 +1,12 @@
 # Change this to whatever you want.
 # Don't use spaces in the labels.
 
+DOCUMENTATION
+PROPOSAL
 BUG
-FEATURE
+FEATURE-REQUEST
+WINDOWS
+LINUX
+MACOS
+
+

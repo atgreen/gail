@@ -3,6 +3,7 @@ autoload, ghcr.io/ocicl/mgl-pax-bootstrap@sha256:bc755f7c632a14f25eeca7950a30a0e
 babel, ghcr.io/ocicl/babel@sha256:b505136744213e6b953913780a4b647da40e83818a10f41004846863b5037810, babel-20240606-23c1440/babel.asd
 babel-streams, ghcr.io/ocicl/babel@sha256:b505136744213e6b953913780a4b647da40e83818a10f41004846863b5037810, babel-20240606-23c1440/babel-streams.asd
 babel-tests, ghcr.io/ocicl/babel@sha256:b505136744213e6b953913780a4b647da40e83818a10f41004846863b5037810, babel-20240606-23c1440/babel-tests.asd
+bobbin, ghcr.io/ocicl/bobbin@sha256:7368d88e9f1d8a94b9bddf5e1887e384ef738235570142dd1cfe98c90077cc13, bobbin-20240503-b454e82/bobbin.asd
 bordeaux-threads, ghcr.io/ocicl/bordeaux-threads@sha256:bbb32afe3987e102149cc019f4f7366a05f7a37d1503f5f86a27745e671c320a, bordeaux-threads-0.9.4/bordeaux-threads.asd
 cffi, ghcr.io/ocicl/cffi@sha256:386698d4f568be8c321ca8f54247a8bf69222819c116c011d6ae53d80772f611, cffi-20250311-48eaef6/cffi.asd
 cffi-examples, ghcr.io/ocicl/cffi@sha256:386698d4f568be8c321ca8f54247a8bf69222819c116c011d6ae53d80772f611, cffi-20250311-48eaef6/cffi-examples.asd
@@ -24,6 +25,8 @@ cl-json, ghcr.io/ocicl/cl-json@sha256:54c4d00901c2c5b0ea9da11eed8f0104fc5819e1ed
 cl-postgres_plus_local-time, ghcr.io/ocicl/local-time@sha256:7f53539308b9fdfd32cfd6a632ee25f5c3a4187cf5ef858d33846e6b1e33d3df, local-time-20250427-fea5b15/cl-postgres+local-time.asd
 cl-ppcre, ghcr.io/ocicl/cl-ppcre@sha256:584907e0683621973579f397115945ef73e9d5b7afa77fae7cacecb3ad272f89, cl-ppcre-20240503-80fb19d/cl-ppcre.asd
 cl-ppcre-unicode, ghcr.io/ocicl/cl-ppcre@sha256:584907e0683621973579f397115945ef73e9d5b7afa77fae7cacecb3ad272f89, cl-ppcre-20240503-80fb19d/cl-ppcre-unicode.asd
+cl-reexport, ghcr.io/ocicl/cl-reexport@sha256:c795feb3e3727a19e61797187eb31bac1e855b1332335d26752200a28e9b9da8, cl-reexport-20240503-03ad7a0/cl-reexport.asd
+cl-reexport-test, ghcr.io/ocicl/cl-reexport@sha256:c795feb3e3727a19e61797187eb31bac1e855b1332335d26752200a28e9b9da8, cl-reexport-20240503-03ad7a0/cl-reexport-test.asd
 cl-syntax, ghcr.io/ocicl/cl-syntax@sha256:ab90b9e978876ea97ef63fd91e1d299970f735b343053b26a600914897d0c3a5, cl-syntax-20240503-03f0c32/cl-syntax.asd
 cl-syntax-annot, ghcr.io/ocicl/cl-syntax@sha256:ab90b9e978876ea97ef63fd91e1d299970f735b343053b26a600914897d0c3a5, cl-syntax-20240503-03f0c32/cl-syntax-annot.asd
 cl-syntax-anonfun, ghcr.io/ocicl/cl-syntax@sha256:ab90b9e978876ea97ef63fd91e1d299970f735b343053b26a600914897d0c3a5, cl-syntax-20240503-03f0c32/cl-syntax-anonfun.asd
@@ -35,6 +38,10 @@ cl-unicode, ghcr.io/ocicl/cl-unicode@sha256:d98f12c1271fb3c1812a27d64dfbe95b0bc5
 cl-utilities, ghcr.io/ocicl/cl-utilities@sha256:e5e0676a4e0627332a0fe64d56ed4f1890f0466d715a11e8d95561b4c2baa38f, cl-utilities-20240503-6b4de39/cl-utilities.asd
 cl_plus_ssl, ghcr.io/ocicl/cl_plus_ssl@sha256:c7cc1593354e63ba3466fdd37ef3fefd2a68304542c965976f98d8744bed8f0d, cl-plus-ssl-20250424-38e501f/cl+ssl.asd
 cl_plus_ssl.test, ghcr.io/ocicl/cl_plus_ssl@sha256:c7cc1593354e63ba3466fdd37ef3fefd2a68304542c965976f98d8744bed8f0d, cl-plus-ssl-20250424-38e501f/cl+ssl.test.asd
+clingon, ghcr.io/ocicl/clingon@sha256:8d9021c0f530b1bbb019c672f64a703112544f489654c89cbe4ce93c60888664, clingon-20240603-f2a730f/clingon.asd
+clingon.demo, ghcr.io/ocicl/clingon@sha256:8d9021c0f530b1bbb019c672f64a703112544f489654c89cbe4ce93c60888664, clingon-20240603-f2a730f/clingon.demo.asd
+clingon.intro, ghcr.io/ocicl/clingon@sha256:8d9021c0f530b1bbb019c672f64a703112544f489654c89cbe4ce93c60888664, clingon-20240603-f2a730f/clingon.intro.asd
+clingon.test, ghcr.io/ocicl/clingon@sha256:8d9021c0f530b1bbb019c672f64a703112544f489654c89cbe4ce93c60888664, clingon-20240603-f2a730f/clingon.test.asd
 completions, ghcr.io/ocicl/completions@sha256:ac249704fdcc52ff67ff35e1959863c4796d60f89b314be4a49869a76e230fec, cl-completions-20241104-76fd9fe/completions.asd
 dexador, ghcr.io/ocicl/dexador@sha256:d1e8ca389d304fcab5d05a85015b9b75d98c9aab3618c9e895a12dee278b6122, dexador-20240925-d7ac217/dexador.asd
 dexador-test, ghcr.io/ocicl/dexador@sha256:d1e8ca389d304fcab5d05a85015b9b75d98c9aab3618c9e895a12dee278b6122, dexador-20240925-d7ac217/dexador-test.asd
@@ -89,5 +96,6 @@ usocket, ghcr.io/ocicl/usocket@sha256:015b8cdb91cdc25aefd08054e8ede6a5d054d10bc8
 usocket-server, ghcr.io/ocicl/usocket@sha256:015b8cdb91cdc25aefd08054e8ede6a5d054d10bc87916904cf0d0670b3f4a68, usocket-0.8.8/usocket-server.asd
 usocket-test, ghcr.io/ocicl/usocket@sha256:015b8cdb91cdc25aefd08054e8ede6a5d054d10bc87916904cf0d0670b3f4a68, usocket-0.8.8/usocket-test.asd
 winhttp, ghcr.io/ocicl/winhttp@sha256:f4955086d194e6ae1665894da2149dac0ad850d95369f85fdda4d95cd06f3641, winhttp-20240503-8611ba5/winhttp.asd
+with-user-abort, ghcr.io/ocicl/with-user-abort@sha256:c19560034f9909a7afb4110b5efd939a9f1e829d9ef9887797b98679f290c480, with-user-abort-20240503-a3db02e/with-user-abort.asd
 xsubseq, ghcr.io/ocicl/xsubseq@sha256:7605d14f7cc7fd2f63190ad81fe7bd65daef105d6728ee6bb59baef49da2aa51, xsubseq-20240503-5ce430b/xsubseq.asd
 xsubseq-test, ghcr.io/ocicl/xsubseq@sha256:7605d14f7cc7fd2f63190ad81fe7bd65daef105d6728ee6bb59baef49da2aa51, xsubseq-20240503-5ce430b/xsubseq-test.asd

@@ -27,29 +27,38 @@ Labeling Issues has never been easier.  Here's the `gail` help message
 with all of the instructions that you'll need:
 
 ```
-gail 1.0 - copyright (C) 2025 Anthony Green <green@moxielogic.com>
+NAME:
+  gail - GitHub Issue Auto-Labeler using AI
 
-Usage: ./gail [OPTIONS] OWNER REPO
+USAGE:
+  gail OWNER REPO
 
-Options:
-  -l, --labels FILE     Labels file (default: labels.txt)
-  -n, --dry-run         Show what would be labeled without actually labeling
-  -m, --model MODEL     OpenAI model to use (default: gpt-4o-mini)
-  -h, --help            Show this help message
+OPTIONS:
+      --help           display usage information and exit
+      --version        display version and exit
+  -l, --labels <PATH>  Labels file [default: .gail-labels]
+  -m, --model <VALUE>  OpenAI model to use [default: gpt-4o-mini]
+  -n, --dry-run        Show what would be labeled without actually labeling
 
-Arguments:
-  OWNER                 GitHub repository owner
-  REPO                  GitHub repository name
+EXAMPLES:
 
-Environment variables:
-  GITHUB_TOKEN          GitHub API token (required)
-  OPENAI_KEY            OpenAI API key (required)
+  Label issues in the libffi/libffi repository:
 
-Examples:
-  ./gail libffi libffi
-  ./gail --labels my-labels.txt --dry-run microsoft vscode
+    gail libffi libffi
 
-Distributed under the terms of the MIT License
+  Dry run with custom labels file:
+
+    gail --labels my-labels.txt --dry-run microsoft vscode
+
+  Use a different OpenAI model:
+
+    gail --model gpt-4 owner repo
+
+AUTHORS:
+  Anthony Green <green@moxielogic.com>
+
+LICENSE:
+  MIT License
 ```
 
 
