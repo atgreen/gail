@@ -1,0 +1,5 @@
+# Change this to whatever you want.
+# Don't use spaces in the labels.
+
+BUG
+FEATURE
