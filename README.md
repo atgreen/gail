@@ -61,6 +61,10 @@ LICENSE:
   MIT License
 ```
 
+Note that you can simply commit your custom `.gail-labels` file to
+your repo and run `gail` in your project's root directory in order to
+pick up your custom labels.
+
 
 Author and License
 -------------------
