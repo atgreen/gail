@@ -6,7 +6,7 @@ What is it?
 ``gail`` will review the Issues in your GitHub-hosted project and,
 where appropriate, assign new labels to the Issues from a list of
 label options you provide. ``gail`` is currently configured to use
-OpenAI LLM's to accomplish this.
+OpenAI LLMs to accomplish this.
 
 I wrote `gail` to add some semblance of order to [libffi's ~200 open
 Issues](https://github.com/libffi/libffi/issues).  It exceeded
