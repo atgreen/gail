@@ -132,7 +132,7 @@ Don't say anything else.\n\n~A\n\nAnswer:"
         (args (clingon:command-arguments cmd)))
 
     ;; Validate positional arguments
-    (when (< (length args) 2)
+    (when (not (eq (length args) 2)
       (format *error-output* "Error: OWNER and REPO arguments are required~%~%")
       (clingon:print-usage-and-exit cmd t))
 
