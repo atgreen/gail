@@ -8,6 +8,10 @@ where appropriate, assign new labels to the Issues from a list of
 label options you provide. ``gail`` is currently configured to use
 OpenAI LLM's to accomplish this.
 
+I wrote `gail` to add some semblance of order to [libffi's ~200 open
+Issues](https://github.com/libffi/libffi/issues).  It exceeded
+expectations, and I hope you enjoy it as well!
+
 Building `gail`
 ----------------
 Download all dependencies using [`ocicl`](https://github.com/ocicl/ocicl).
