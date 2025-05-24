@@ -63,7 +63,8 @@ LICENSE:
 
 Note that you can simply commit your custom `.gail-labels` file to
 your repo and run `gail` in your project's root directory in order to
-pick up your custom labels.
+pick up your custom labels.  As an example, here's the file I created
+for libffi: https://github.com/libffi/libffi/blob/master/.gail-labels
 
 
 Author and License
