@@ -1,5 +1,5 @@
-all:
-	sbcl --load gail.lisp --eval "(sb-ext:save-lisp-and-die \"gail\" :executable t :toplevel #'gail::main)"
+gail: *.lisp *.asd
+	sbcl --eval "(asdf:make :gail)"
 
 clean:
 	rm -rf *~ gail

@@ -1,8 +1,27 @@
-(asdf:load-system :completions)
-(asdf:load-system :dexador)
-(asdf:load-system :jonathan)
-(asdf:load-system :split-sequence)
-(asdf:load-system :clingon)
+;;; gail.lisp
+;;;
+;;; SPDX-License-Identifier: MIT
+;;;
+;;; Copyright (C) 2025  Anthony Green <green@moxielogic.com>
+;;;
+;;; Permission is hereby granted, free of charge, to any person obtaining a copy
+;;; of this software and associated documentation files (the "Software"), to deal
+;;; in the Software without restriction, including without limitation the rights
+;;; to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+;;; copies of the Software, and to permit persons to whom the Software is
+;;; furnished to do so, subject to the following conditions:
+;;;
+;;; The above copyright notice and this permission notice shall be included in all
+;;; copies or substantial portions of the Software.
+;;;
+;;; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+;;; IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+;;; FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+;;; AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+;;; LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+;;; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+;;; SOFTWARE.
+;;;
 
 (defpackage :gail
   (:use :cl :split-sequence)
@@ -60,10 +79,10 @@
 (defun classify-json-with-ai (completer json-string available-labels)
   (let* ((labels-string (format nil "~{~A~^, ~}" available-labels))
          (prompt (format nil
-                 "Examine the following JSON object representing a GitHub issue. \
-Respond with the Issue Number followed by a space-separated list of labels that are appropriate for this issue. \
+                 "Examine the following JSON object representing a GitHub issue.
+Respond with the Issue Number followed by a space-separated list of labels that are appropriate for this issue.
 Here are your label choices: ~A.
-~%~%If none of the label choices are appropriate for the issue, don't list any. \
+~%~%If none of the label choices are appropriate for the issue, don't list any.
 Don't say anything else.\n\n~A\n\nAnswer:"
                  labels-string json-string)))
     (handler-case
@@ -167,8 +186,8 @@ Don't say anything else.\n\n~A\n\nAnswer:"
   "Create the main gail command"
   (clingon:make-command
    :name "gail"
-   :version "1.0"
-   :description "GitHub Issue Auto-Labeler using AI"
+   :version "1.0.0"
+   :description "GitHub Automated Issue Labeler"
    :authors '("Anthony Green <green@moxielogic.com>")
    :license "MIT License"
    :usage "OWNER REPO"
