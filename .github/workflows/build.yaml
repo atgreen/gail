@@ -1,0 +1,46 @@
+# SPDX-FileCopyrightText:  Copyright 2025 Anthony Green
+# SPDX-License-Identifier: MIT
+#
+# Project:  gail
+# File:     build.yaml
+# Date:     2025-05-27
+#
+# ==============================================================================
+
+name: Build
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+
+jobs:
+  tests:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup SBCL and ocicl
+        run: |
+          eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          brew install sbcl ocicl dejagnu
+          ocicl setup >> ~/.sbclrc
+
+      - name: Install dependencies
+        run: |
+          eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          ocicl install
+
+      - name: Build
+        run: |
+          eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          make
