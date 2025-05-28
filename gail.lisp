@@ -76,6 +76,15 @@
        do (incf page))
     (nreverse results)))
 
+(defun read-stdin-issue ()
+  "Read entire issue content from stdin as one blob of text."
+  (format t "Reading issue from stdin...~%")
+  (let ((content-lines '()))
+    (loop for line = (read-line *standard-input* nil nil)
+          while line
+          do (push line content-lines))
+    (format nil "~{~A~^~%~}" (nreverse content-lines))))
+
 (defun classify-json-with-ai (completer json-string available-labels)
   (let* ((labels-string (format nil "~{~A~^, ~}" available-labels))
          (prompt (format nil
@@ -93,6 +102,34 @@ Don't say anything else.\n\n~A\n\nAnswer:"
           (let ((response (slot-value e 'dexador.error::response)))
             (format t "Response body: ~A~%" response)))
         (uiop:quit)))))
+
+(defun classify-stdin-issue (completer available-labels)
+  "Process a single issue from stdin and return suggested labels and issue number."
+  (let ((issue-content (read-stdin-issue)))
+    (let* ((labels-string (format nil "~{~A~^, ~}" available-labels))
+           (prompt (format nil
+                   "Examine the following GitHub issue content.
+Respond with the Issue Number followed by a space-separated list of labels that are appropriate for this issue.
+Here are your label choices: ~A.
+~%~%If none of the label choices are appropriate for the issue, don't list any.
+Don't say anything else.\n\n~A\n\nAnswer:"
+                   labels-string issue-content)))
+      (handler-case
+          (let ((result (completions:get-completion completer prompt :max-tokens 16384)))
+            (let* ((trimmed-result (string-trim '(#\Space #\Tab #\Newline) result)))
+              (when (> (length trimmed-result) 0)
+                (let* ((parts (split-sequence #\Space trimmed-result :remove-empty-subseqs t))
+                       (issue-num (first parts))
+                       (labels (map 'list #'string-downcase (rest parts))))
+                  (when (and issue-num labels)
+                    (format t "~%Issue ~a suggested labels: ~{~A~^, ~}~%" issue-num labels)
+                    (values issue-num labels))))))
+        (dexador.error:http-request-bad-request (e)
+          (format t "~&HTTP error: ~A~%" e)
+          (when (slot-boundp e 'dexador.error::response)
+            (let ((response (slot-value e 'dexador.error::response)))
+              (format t "Response body: ~A~%" response)))
+          (uiop:quit))))))
 
 (defun label-issues (json-pages completer owner repo available-labels &key dry-run)
   (let ((token (get-github-token)))
@@ -141,56 +178,86 @@ Don't say anything else.\n\n~A\n\nAnswer:"
     :short-name #\m
     :long-name "model"
     :initial-value "gpt-4o-mini"
-    :key :model)))
+    :key :model)
+
+   (clingon:make-option
+    :flag
+    :description "Process a single issue from stdin instead of fetching from repository"
+    :short-name #\a
+    :long-name "action"
+    :key :action)))
 
 (defun gail/handler (cmd)
   "Main command handler for gail"
   (let ((labels-file (clingon:getopt cmd :labels-file))
         (dry-run (clingon:getopt cmd :dry-run))
         (model (clingon:getopt cmd :model))
+        (action (clingon:getopt cmd :action))
         (args (clingon:command-arguments cmd)))
 
-    ;; Validate positional arguments
-    (when (not (eq (length args) 2))
-      (format *error-output* "Error: OWNER and REPO arguments are required~%~%")
-      (clingon:print-usage-and-exit cmd t))
+    ;; Validate positional arguments based on action mode
+    (cond
+      ((and (not action) (not (eq (length args) 2)))
+       (format *error-output* "Error: OWNER and REPO arguments are required when not using --action~%~%")
+       (clingon:print-usage-and-exit cmd t))
+      ((and action (not (eq (length args) 2)))
+       (format *error-output* "Error: OWNER and REPO arguments are required when using --action~%~%")
+       (clingon:print-usage-and-exit cmd t)))
 
-    (let ((owner (first args))
-          (repo (second args)))
+    ;; Read labels from file
+    (let ((available-labels (read-labels-from-file labels-file)))
+      (unless available-labels
+        (format *error-output* "Error: Could not read labels from ~a or file is empty~%" labels-file)
+        (uiop:quit 1))
 
-      ;; Read labels from file
-      (let ((available-labels (read-labels-from-file labels-file)))
-        (unless available-labels
-          (format *error-output* "Error: Could not read labels from ~a or file is empty~%" labels-file)
-          (uiop:quit 1))
+      (format t "Using labels from ~a: ~{~A~^, ~}~%" labels-file available-labels)
+      (format t "Model: ~a~%" model)
+      (when dry-run
+        (format t "DRY RUN MODE - No labels will actually be applied~%"))
+      (format t "~%")
 
-        (format t "Using labels from ~a: ~{~A~^, ~}~%" labels-file available-labels)
-        (format t "Repository: ~a/~a~%" owner repo)
-        (format t "Model: ~a~%" model)
-        (when dry-run
-          (format t "DRY RUN MODE - No labels will actually be applied~%"))
-        (format t "~%")
+      (if action
+          ;; Action mode: process single issue from stdin and apply labels
+          (let ((owner (first args))
+                (repo (second args))
+                (completer (make-instance 'completions:openai-completer
+                                          :api-key (get-openai-key)
+                                          :model model)))
+            (format t "Repository: ~a/~a~%" owner repo)
+            (multiple-value-bind (issue-number suggested-labels)
+                (classify-stdin-issue completer available-labels)
+              (when (and issue-number suggested-labels)
+                (format t "Applying labels to issue ~a: ~{~A~^, ~}~%" issue-number suggested-labels)
+                (unless dry-run
+                  (handler-case
+                      (progn
+                        (attach-labels owner repo issue-number suggested-labels (get-github-token))
+                        (format t "  Success!~%"))
+                    (error (e)
+                      (format t "  Error applying labels to issue ~a: ~a~%" issue-number e)))))))
+          ;; Normal mode: process repository issues
+          (let ((owner (first args))
+                (repo (second args)))
+            (format t "Repository: ~a/~a~%" owner repo)
+            (format t "Fetching issues from ~a/~a...~%" owner repo)
+            (let ((json-pages (fetch-all-issues-raw owner repo))
+                  (completer (make-instance 'completions:openai-completer
+                                            :api-key (get-openai-key)
+                                            :model model)))
+              (format t "Processing ~d page(s) of issues...~%" (length json-pages))
+              (label-issues json-pages completer owner repo available-labels :dry-run dry-run))))
 
-        ;; Fetch issues and process them
-        (format t "Fetching issues from ~a/~a...~%" owner repo)
-        (let ((json-pages (fetch-all-issues-raw owner repo))
-              (completer (make-instance 'completions:openai-completer
-                                        :api-key (get-openai-key)
-                                        :model model)))
-          (format t "Processing ~d page(s) of issues...~%" (length json-pages))
-          (label-issues json-pages completer owner repo available-labels :dry-run dry-run))
-
-        (format t "~&Done.~%")))))
+      (format t "~&Done.~%"))))
 
 (defun gail/command ()
   "Create the main gail command"
   (clingon:make-command
    :name "gail"
-   :version "1.0.1"
+   :version "1.1.0"
    :description "GitHub Automated Issue Labeler"
    :authors '("Anthony Green <green@moxielogic.com>")
    :license "MIT License"
-   :usage "OWNER REPO"
+   :usage "OWNER REPO | --action OWNER REPO"
    :options (gail/options)
    :handler #'gail/handler
    :examples '(("Label issues in the libffi/libffi repository:"
@@ -198,7 +265,11 @@ Don't say anything else.\n\n~A\n\nAnswer:"
                ("Dry run with custom labels file:"
                 . "gail --labels my-labels.txt --dry-run microsoft vscode")
                ("Use a different OpenAI model:"
-                . "gail --model gpt-4 owner repo"))))
+                . "gail --model gpt-4 owner repo")
+               ("Process a single issue from stdin:"
+                . "gail --action owner repo")
+               ("Process stdin issue with custom labels:"
+                . "gail --action --labels my-labels.txt owner repo"))))
 
 (defun main ()
   "Main entry point"
