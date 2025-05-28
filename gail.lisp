@@ -186,7 +186,7 @@ Don't say anything else.\n\n~A\n\nAnswer:"
   "Create the main gail command"
   (clingon:make-command
    :name "gail"
-   :version "1.0.0"
+   :version "1.0.1"
    :description "GitHub Automated Issue Labeler"
    :authors '("Anthony Green <green@moxielogic.com>")
    :license "MIT License"
