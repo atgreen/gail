@@ -8,6 +8,10 @@ where appropriate, assign new labels to the Issues from a list of
 label options you provide. ``gail`` is currently configured to use
 OpenAI LLMs to accomplish this.
 
+You can also use `gail` in GitHub Actions to label all new incoming
+Issues.  Checkout the easy-to-use GitHub Action here:
+https://github.com/atgreen/gail-issue-labeler-action
+
 I wrote `gail` to add some semblance of order to [libffi's ~200 open
 Issues](https://github.com/libffi/libffi/issues).  It exceeded
 expectations, and I hope you enjoy it as well!
@@ -65,7 +69,6 @@ Note that you can simply commit your custom `.gail-labels` file to
 your repo and run `gail` in your project's root directory in order to
 pick up your custom labels.  As an example, here's the file I created
 for libffi: https://github.com/libffi/libffi/blob/master/.gail-labels
-
 
 Author and License
 -------------------
