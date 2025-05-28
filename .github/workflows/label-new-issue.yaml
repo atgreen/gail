@@ -11,5 +11,5 @@ jobs:
       - id: label-new-issue
         uses: atgreen/gail-issue-labeler-action@master
         with:
-          llm_api_key: ${{ secrets.GITHUB_TOKEN }}
-          github_token: ${{ secrets.OPENAI_KEY }}
+          llm_api_key: ${{ secrets.OPENAI_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
