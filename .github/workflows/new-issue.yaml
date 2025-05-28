@@ -11,13 +11,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Display issue information
-        run: |
-          echo "New issue created: ${{ github.event.issue.title }}"
-          echo "Issue number: ${{ github.event.issue.number }}"
-          echo "Issue body:"
-          echo "${{ github.event.issue.body }}"
-
       - name: Download latest GAIL release
         id: download-gail
         run: |
@@ -33,13 +26,13 @@ jobs:
           echo "GAIL_PATH=$(pwd)/gail-linux-x86_64" >> $GITHUB_ENV
           echo "asset_path=$(pwd)/gail-linux-x86_64" >> $GITHUB_OUTPUT
 
-      - name: Verify GAIL download
+      - name: Run gail
         run: |
-          ls -la gail-linux-x86_64
-          ./gail-linux-x86_64 --version || echo "Version check failed (might be expected)"
-
-      # Example of using GAIL in a subsequent step
-      - name: Use GAIL (example)
-        run: |
-          echo "Using GAIL at $GAIL_PATH"
-          $GAIL_PATH --help || true
+          echo "Issue title: {{ github.event.issue.title }}" > action-issue.txt
+          echo "Issue number: ${{ github.event.issue.number }}" >> action-issue.txt
+          echo "Issue body:" >> action-issue.txt
+          echo "${{ github.event.issue.body }}" >> action-issue.txt
+          cat action-issue | $GAIL_PATH --action "${{ github.repository_owner }}" "${{ github.event.repository.name }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
