@@ -1,0 +1,45 @@
+name: New Issue Notifier
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  log_issue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Display issue information
+        run: |
+          echo "New issue created: ${{ github.event.issue.title }}"
+          echo "Issue number: ${{ github.event.issue.number }}"
+          echo "Issue body:"
+          echo "${{ github.event.issue.body }}"
+
+      - name: Download latest GAIL release
+        id: download-gail
+        run: |
+          # Get the latest release info
+          LATEST_RELEASE=$(curl -s https://api.github.com/repos/atgreen/gail/releases/latest)
+          ASSET_URL=$(echo "$LATEST_RELEASE" | jq -r '.assets[] | select(.name == "gail-linux-x86_64") | .browser_download_url')
+
+          # Download the asset
+          wget "$ASSET_URL" -O gail-linux-x86_64
+          chmod +x gail-linux-x86_64
+
+          # Make it available for subsequent steps
+          echo "GAIL_PATH=$(pwd)/gail-linux-x86_64" >> $GITHUB_ENV
+          echo "asset_path=$(pwd)/gail-linux-x86_64" >> $GITHUB_OUTPUT
+
+      - name: Verify GAIL download
+        run: |
+          ls -la gail-linux-x86_64
+          ./gail-linux-x86_64 --version || echo "Version check failed (might be expected)"
+
+      # Example of using GAIL in a subsequent step
+      - name: Use GAIL (example)
+        run: |
+          echo "Using GAIL at $GAIL_PATH"
+          $GAIL_PATH --help || true
