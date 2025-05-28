@@ -9,7 +9,7 @@ jobs:
     name: Label new issue
     steps:
       - id: label-new-issue
-        uses: atgreen/gail-issue-labeler-action@master
+        uses: atgreen/gail-issue-labeler-action@v1
         with:
           llm_api_key: ${{ secrets.OPENAI_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
