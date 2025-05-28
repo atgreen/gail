@@ -24,7 +24,7 @@
 ;;;
 
 (defsystem "gail"
-  :version "1.1.0"
+  :version "1.1.1"
   :author "Anthony Green <green@moxielogic.com>"
   :license "MIT"
   :depends-on (:completions :dexador :jonathan :split-sequence :clingon)
