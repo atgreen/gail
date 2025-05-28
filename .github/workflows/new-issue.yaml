@@ -32,7 +32,7 @@ jobs:
           echo "Issue number: ${{ github.event.issue.number }}" >> action-issue.txt
           echo "Issue body:" >> action-issue.txt
           echo "${{ github.event.issue.body }}" >> action-issue.txt
-          cat action-issue | $GAIL_PATH --action "${{ github.repository_owner }}" "${{ github.event.repository.name }}"
+          cat action-issue.txt | $GAIL_PATH --action "${{ github.repository_owner }}" "${{ github.event.repository.name }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
