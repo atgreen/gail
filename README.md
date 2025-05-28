@@ -32,14 +32,15 @@ with all of the instructions that you'll need:
 
 ```
 NAME:
-  gail - GitHub Issue Auto-Labeler using AI
+  gail - GitHub Automated Issue Labeler
 
 USAGE:
-  gail OWNER REPO
+  gail OWNER REPO | --action OWNER REPO
 
 OPTIONS:
       --help           display usage information and exit
       --version        display version and exit
+  -a, --action         Process a single issue from stdin instead of fetching from repository
   -l, --labels <PATH>  Labels file [default: .gail-labels]
   -m, --model <VALUE>  OpenAI model to use [default: gpt-4o-mini]
   -n, --dry-run        Show what would be labeled without actually labeling
@@ -57,6 +58,14 @@ EXAMPLES:
   Use a different OpenAI model:
 
     gail --model gpt-4 owner repo
+
+  Process a single issue from stdin:
+
+    gail --action owner repo
+
+  Process stdin issue with custom labels:
+
+    gail --action --labels my-labels.txt owner repo
 
 AUTHORS:
   Anthony Green <green@moxielogic.com>
