@@ -34,7 +34,7 @@ jobs:
           eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
           brew install sbcl ocicl dejagnu
           ocicl setup >> ~/.sbclrc
-          patchelf --set-interpreter /lib64/ld-linux-x86-64.so.2 --set-rpath /lib64 $(which sbcl)
+          patchelf --set-interpreter /lib64/ld-linux-x86-64.so.2 --set-rpath /lib64 /home/linuxbrew/.linuxbrew/Cellar/sbcl/*/bin/sbcl
 
       - name: Install dependencies
         run: |
